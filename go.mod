@@ -1,4 +1,4 @@
-module github.com/jelaniharris/fetchreceiptprocessor
+module github.com/jelaniharris/FetchReceiptProcessor
 
 go 1.20
 

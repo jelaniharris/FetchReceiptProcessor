@@ -1,8 +1,13 @@
-package main
+package rules
 
-import "testing"
+import (
+	"testing"
 
-type AlphanumericPointsStruct struct {
+	"github.com/jelaniharris/FetchReceiptProcessor/internal/types"
+)
+
+// Structures for testing point generation rules
+type AlphanumericLengthStruct struct {
 	arg1     string
 	expected int
 }
@@ -19,13 +24,13 @@ type IsTotalAMultiplierStruct struct {
 }
 
 type ItemsLengthGroupingStruct struct {
-	arg1     []item
+	arg1     []types.Item
 	arg2     int
 	expected int
 }
 
 type ItemDescriptionPricePointsStruct struct {
-	arg1           item
+	arg1           types.Item
 	expectedLength int
 	expectedValue  float64
 }
@@ -40,9 +45,9 @@ type CheckPurchaseTimeStruct struct {
 	expected bool
 }
 
-func TestAlphanumericPoints(t *testing.T) {
+func TestAlphanumericLength(t *testing.T) {
 
-	testTable := []AlphanumericPointsStruct{
+	testTable := []AlphanumericLengthStruct{
 		{"abcd", 4},
 		{"abcdefghijklmnopqrstuvwxyz", 26},
 		{"ABDEFGHIJK", 10},
@@ -55,8 +60,8 @@ func TestAlphanumericPoints(t *testing.T) {
 	}
 
 	for _, test := range testTable {
-		if output := alphanumericPoints(test.arg1); output != test.expected {
-			t.Errorf("alphanumericPoints(%q) = got %d, wanted %d", test.arg1, output, test.expected)
+		if output := alphanumericLength(test.arg1); output != test.expected {
+			t.Errorf("alphanumericLength(%q) = got %d, wanted %d", test.arg1, output, test.expected)
 		}
 	}
 }
@@ -95,21 +100,21 @@ func TestIsTotalAMultiplier(t *testing.T) {
 func TestItemsLengthGrouping(t *testing.T) {
 	testTable := []ItemsLengthGroupingStruct{
 		{nil, 2, 0},
-		{[]item{}, 2, 0},
-		{[]item{
+		{[]types.Item{}, 2, 0},
+		{[]types.Item{
 			{ShortDescription: "Pepsi - 12-oz", Price: "1.25"},
 			{ShortDescription: "Dasani", Price: "1.40"},
 		}, 2, 1},
-		{[]item{
+		{[]types.Item{
 			{ShortDescription: "Pepsi - 12-oz", Price: "1.25"},
 		}, 2, 0},
-		{[]item{
+		{[]types.Item{
 			{ShortDescription: "Pepsi - 12-oz", Price: "1.25"},
 			{ShortDescription: "Dasani", Price: "1.40"},
 			{ShortDescription: "Mike & Ikes", Price: "1.15"},
 			{ShortDescription: "Snickers Ice Cream Bar", Price: "2.25"},
 		}, 2, 2},
-		{[]item{
+		{[]types.Item{
 			{ShortDescription: "Vitamin Water", Price: "1.99"},
 			{ShortDescription: "Mike & Ikes", Price: "1.15"},
 			{ShortDescription: "Snickers Ice Cream Bar", Price: "2.25"},
@@ -125,9 +130,9 @@ func TestItemsLengthGrouping(t *testing.T) {
 
 func TestItemDescriptionPricePoints(t *testing.T) {
 	testTable := []ItemDescriptionPricePointsStruct{
-		{item{ShortDescription: "Pepsi - 12-oz", Price: "1.25"}, 13, 0},
-		{item{ShortDescription: "Target", Price: "1.25"}, 6, 0.25},
-		{item{ShortDescription: "  Pez  ", Price: "1.00"}, 3, 0.20},
+		{types.Item{ShortDescription: "Pepsi - 12-oz", Price: "1.25"}, 13, 0},
+		{types.Item{ShortDescription: "Target", Price: "1.25"}, 6, 0.25},
+		{types.Item{ShortDescription: "  Pez  ", Price: "1.00"}, 3, 0.20},
 	}
 
 	for _, test := range testTable {
