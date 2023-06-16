@@ -2,12 +2,16 @@
 
 This is a webservice that allows you to create a receipt and calculate a point value of that receipt using a set of rules.
 
+This uses [GIN web framework](https://github.com/gin-gonic/gin) and [Google's UUID](https://github.com/google/uuid) to generate unique id for new receipts
+
 ## How to run
 
 ### Start the webservice
 ```
 go run .
 ```
+
+The webserver will listen and serve at localhost( or 0.0.0.0) on `port 8080`.
 
 ### Running the tests
 ```

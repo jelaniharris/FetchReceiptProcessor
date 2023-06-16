@@ -9,14 +9,16 @@ import (
 func main() {
 	router := gin.Default()
 
+	receiptsGroup := router.Group("/receipts")
+
 	// Get a listing of all receipts
-	router.GET("/receipts", api.GetReceipts)
+	receiptsGroup.GET("", api.GetReceipts)
 	// Get a single receipt by an id
-	router.GET("/receipts/:id", api.GetReceipt)
+	receiptsGroup.GET(":id", api.GetReceipt)
 	// Return the point value of a receipt
-	router.GET("/receipts/:id/points", api.GetReceiptPoints)
+	receiptsGroup.GET(":id/points", api.GetReceiptPoints)
 	// Creates a receipt
-	router.POST("/receipts/process", api.CreateReceipt)
+	receiptsGroup.POST("process", api.CreateReceipt)
 
 	// Start up the server at 8080
 	router.Run("localhost:8080")
