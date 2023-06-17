@@ -3,7 +3,7 @@ package rules
 import (
 	"testing"
 
-	"github.com/jelaniharris/FetchReceiptProcessor/internal/types"
+	"github.com/jelaniharris/FetchReceiptProcessor/internal/models"
 )
 
 // Structures for testing point generation rules
@@ -24,13 +24,13 @@ type IsTotalAMultiplierStruct struct {
 }
 
 type ItemsLengthGroupingStruct struct {
-	arg1     []types.Item
+	arg1     []models.Item
 	arg2     int
 	expected int
 }
 
 type ItemDescriptionPricePointsStruct struct {
-	arg1           types.Item
+	arg1           models.Item
 	expectedLength int
 	expectedValue  float64
 }
@@ -100,21 +100,21 @@ func TestIsTotalAMultiplier(t *testing.T) {
 func TestItemsLengthGrouping(t *testing.T) {
 	testTable := []ItemsLengthGroupingStruct{
 		{nil, 2, 0},
-		{[]types.Item{}, 2, 0},
-		{[]types.Item{
+		{[]models.Item{}, 2, 0},
+		{[]models.Item{
 			{ShortDescription: "Pepsi - 12-oz", Price: "1.25"},
 			{ShortDescription: "Dasani", Price: "1.40"},
 		}, 2, 1},
-		{[]types.Item{
+		{[]models.Item{
 			{ShortDescription: "Pepsi - 12-oz", Price: "1.25"},
 		}, 2, 0},
-		{[]types.Item{
+		{[]models.Item{
 			{ShortDescription: "Pepsi - 12-oz", Price: "1.25"},
 			{ShortDescription: "Dasani", Price: "1.40"},
 			{ShortDescription: "Mike & Ikes", Price: "1.15"},
 			{ShortDescription: "Snickers Ice Cream Bar", Price: "2.25"},
 		}, 2, 2},
-		{[]types.Item{
+		{[]models.Item{
 			{ShortDescription: "Vitamin Water", Price: "1.99"},
 			{ShortDescription: "Mike & Ikes", Price: "1.15"},
 			{ShortDescription: "Snickers Ice Cream Bar", Price: "2.25"},
@@ -130,9 +130,9 @@ func TestItemsLengthGrouping(t *testing.T) {
 
 func TestItemDescriptionPricePoints(t *testing.T) {
 	testTable := []ItemDescriptionPricePointsStruct{
-		{types.Item{ShortDescription: "Pepsi - 12-oz", Price: "1.25"}, 13, 0},
-		{types.Item{ShortDescription: "Target", Price: "1.25"}, 6, 0.25},
-		{types.Item{ShortDescription: "  Pez  ", Price: "1.00"}, 3, 0.20},
+		{models.Item{ShortDescription: "Pepsi - 12-oz", Price: "1.25"}, 13, 0},
+		{models.Item{ShortDescription: "Target", Price: "1.25"}, 6, 0.25},
+		{models.Item{ShortDescription: "  Pez  ", Price: "1.00"}, 3, 0.20},
 	}
 
 	for _, test := range testTable {

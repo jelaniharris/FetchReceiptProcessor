@@ -9,8 +9,28 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jelaniharris/FetchReceiptProcessor/internal/types"
+	"github.com/jelaniharris/FetchReceiptProcessor/internal/models"
 )
+
+// Stores the result of the point calculation of every item in a receipt
+type PointRuleItem struct {
+	Description       string
+	Price             string
+	DescriptionLength int
+	Value             float64
+}
+
+// Stores the calculated results for a point calculation for a receipt
+type PointRules struct {
+	AlphanumericPoints int
+	RoundDollarPoints  int
+	MultiplierPoints   int
+	GroupingPoints     int
+	GroupingAmount     int
+	PurchaseDatePoints int
+	PurchaseTimePoints int
+	RuleItems          []PointRuleItem
+}
 
 // Calculates the alphanumeric length of a string
 func alphanumericLength(str string) int {
@@ -61,7 +81,7 @@ func isTotalAMultiplier(str string, multiplier float64) bool {
 // Returns the number of groups that can be formed from a list of items
 // Given 8 items and a grouping of 2, that's 4 pairs
 // Given 9 items anda  grouping of 4, that's 2 ... quads?
-func itemsLengthGrouping(items []types.Item, grouping int) int {
+func itemsLengthGrouping(items []models.Item, grouping int) int {
 
 	// Prevent
 	if grouping == 0 {
@@ -74,7 +94,7 @@ func itemsLengthGrouping(items []types.Item, grouping int) int {
 
 // Determines the trimmed length of an items description, and the point value
 // based on if the length is divisible by three
-func itemDescriptionPricePoints(item types.Item) (int, float64) {
+func itemDescriptionPricePoints(item models.Item) (int, float64) {
 	newStr := strings.Trim(item.ShortDescription, " ")
 	length := len(newStr)
 
@@ -131,8 +151,8 @@ func checkPurchaseTime(str string) bool {
 
 // Given a receipt, calculate the amount of points it's worth based on
 // a series of rules
-func CalculatePoints(rec types.Receipt) int {
-	var rulePoints types.PointRules
+func CalculatePoints(rec models.Receipt) int {
+	var rulePoints PointRules
 	currentPoints := 0
 
 	// One point for every alphanumeric character in the retailer name.
@@ -162,7 +182,7 @@ func CalculatePoints(rec types.Receipt) int {
 	for _, item := range rec.Items {
 		descrLength, value := itemDescriptionPricePoints(item)
 		if value > 0 {
-			rulePoints.RuleItems = append(rulePoints.RuleItems, types.PointRuleItem{Price: item.Price, Description: item.ShortDescription, DescriptionLength: descrLength, Value: value})
+			rulePoints.RuleItems = append(rulePoints.RuleItems, PointRuleItem{Price: item.Price, Description: item.ShortDescription, DescriptionLength: descrLength, Value: value})
 			currentPoints += int(math.Ceil(value))
 		}
 	}
@@ -186,7 +206,7 @@ func CalculatePoints(rec types.Receipt) int {
 }
 
 // Log the results of the point calculation
-func showBreakdown(rulePoints types.PointRules, totalPoints int, rec types.Receipt) {
+func showBreakdown(rulePoints PointRules, totalPoints int, rec models.Receipt) {
 	log.Printf("Breakdown for Receipt ID (%q):", rec.ID)
 	if rulePoints.AlphanumericPoints > 0 {
 		log.Printf("%6d points - Retailer name has %d alphanumeric characters \n", rulePoints.AlphanumericPoints, rulePoints.AlphanumericPoints)

@@ -18,6 +18,29 @@ The webserver will listen and serve at localhost( or 0.0.0.0) on `port 8080`.
 go test -v ./...
 ```
 
+## Swagger Documentation
+
+### Install Swagger Library
+```
+go get -u github.com/swaggo/swag/cmd/swag
+```
+
+Or if you're on windows you may have to run
+```
+go install github.com/swaggo/swag/cmd/swag
+```
+
+### Generate Swagger Documentation
+```
+swag init
+```
+
+## Viewing Documentation
+Visit the [documentation link](http://localhost:8080/docs/index.html):
+```
+http://localhost:8080/docs/index.html
+```
+
 ## Endpoints
 
 ### View All Receipts

@@ -2,8 +2,6 @@ package models
 
 import (
 	"testing"
-
-	"github.com/jelaniharris/FetchReceiptProcessor/internal/types"
 )
 
 func TestEmptyGetReceiptById(t *testing.T) {
@@ -19,7 +17,7 @@ func TestEmptyGetReceiptById(t *testing.T) {
 func TestAddReceiptsAndGetReceiptsById(t *testing.T) {
 	t.Cleanup(resetState)
 
-	newReceipt := types.Receipt{
+	newReceipt := Receipt{
 		Retailer:     "Target",
 		PurchaseDate: "2023-06-16",
 		PurchaseTime: "13:30",
@@ -51,7 +49,7 @@ func TestGetReceipts(t *testing.T) {
 		t.Errorf("GetReceipts should be empty")
 	}
 
-	newReceipt := types.Receipt{
+	newReceipt := Receipt{
 		Retailer:     "Target",
 		PurchaseDate: "2023-06-16",
 		PurchaseTime: "13:30",

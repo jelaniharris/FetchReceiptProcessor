@@ -1,0 +1,167 @@
+basePath: /
+definitions:
+  api.CreatedReceiptResponse:
+    description: Receipt processed response with id
+    properties:
+      id:
+        description: The new receipt id
+        type: string
+    required:
+    - id
+    type: object
+  api.ErrorMessage:
+    description: Error Message Information
+    properties:
+      message:
+        description: The message
+        type: string
+    type: object
+  api.ReceiptPointsResponse:
+    description: Receipt points awarded response with points
+    properties:
+      points:
+        description: The points awarded for the receipt
+        type: integer
+    required:
+    - points
+    type: object
+  models.Item:
+    properties:
+      price:
+        description: The total price payed for this item.
+        type: string
+      shortDescription:
+        description: The Short Product Description for the item.
+        type: string
+    required:
+    - price
+    - shortDescription
+    type: object
+  models.Receipt:
+    properties:
+      id:
+        description: The ID of the receipt
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.Item'
+        type: array
+      purchaseDate:
+        description: The date of the purchase printed on the receipt.
+        type: string
+      purchaseTime:
+        description: The time of the purchase printed on the receipt. 24-hour time
+          expected.
+        type: string
+      retailer:
+        description: The name of the retailer or store the receipt is from.
+        type: string
+      total:
+        description: The total amount paid on the receipt.
+        type: string
+    required:
+    - items
+    - purchaseDate
+    - purchaseTime
+    - retailer
+    - total
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a webservice that allows you to create a receipt and calculate
+    a point value of that receipt using a set of rules.
+  title: Fetch Receipt Processor API
+  version: "1.0"
+paths:
+  /receipts:
+    get:
+      description: Get all of the receipts, no limit, no pagination
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/models.Receipt'
+              type: array
+            type: array
+      summary: Get All Receipts
+      tags:
+      - reciepts
+  /receipts/{id}:
+    get:
+      description: Get the receipt by id
+      parameters:
+      - description: get receipt by id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models.Receipt'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorMessage'
+      summary: Get A Receipt
+      tags:
+      - reciepts
+  /receipts/{id}/points:
+    get:
+      description: Returns the points awarded for the receipt
+      parameters:
+      - description: The ID of the receipt
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: The number of points awarded
+          schema:
+            $ref: '#/definitions/api.ReceiptPointsResponse'
+        "404":
+          description: No receipt found for that id
+          schema:
+            $ref: '#/definitions/api.ErrorMessage'
+      summary: Receipt Points
+      tags:
+      - reciepts
+  /receipts/process:
+    post:
+      consumes:
+      - application/json
+      description: Create a receipt and add it to our memory array of receipts. Will
+        not save the id if given one and will always make a new one.
+      parameters:
+      - description: new receipt to create
+        in: body
+        name: receipt
+        required: true
+        schema:
+          $ref: '#/definitions/models.Receipt'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Returns the ID assigned to the receipt
+          schema:
+            $ref: '#/definitions/api.CreatedReceiptResponse'
+        "400":
+          description: The receipt is invalid
+          schema:
+            $ref: '#/definitions/api.ErrorMessage'
+      summary: Process Receipt
+      tags:
+      - reciepts
+swagger: "2.0"
