@@ -103,7 +103,12 @@ func CreateReceipt(c *gin.Context) {
 	if err := c.BindJSON(&newReceipt); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest,
 			ErrorMessage{Message: err.Error()})
+		return
+	}
 
+	if _, err := models.CheckReceipt(newReceipt); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			ErrorMessage{Message: err.Error()})
 		return
 	}
 

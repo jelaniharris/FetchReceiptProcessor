@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -60,4 +61,14 @@ func AddToReceipts(newReceipt Receipt) string {
 	newReceipt.ID = newId
 	receipts = append(receipts, newReceipt)
 	return newId
+}
+
+func CheckReceipt(receipt Receipt) (bool, error) {
+	// Make sure that the purchase date and time are parseable
+	_, err := time.Parse("2006-01-02", receipt.PurchaseDate)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

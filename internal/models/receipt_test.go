@@ -68,6 +68,44 @@ func TestGetReceipts(t *testing.T) {
 	if receiptCount != 5 {
 		t.Errorf("GetReceipts did not get the corrent number of receipts: expected %d, got %d", 5, receiptCount)
 	}
+}
+
+func TestCheckReceipt(t *testing.T) {
+	t.Cleanup(resetState)
+
+	newReceipt := Receipt{
+		Retailer:     "Target",
+		PurchaseDate: "2023-06-16",
+		PurchaseTime: "13:30",
+		Total:        "0.00",
+		Items:        nil,
+	}
+
+	output, err := CheckReceipt(newReceipt)
+
+	if !output {
+		t.Errorf("CheckReceipt was false, expected true")
+	}
+	if err != nil {
+		t.Errorf("CheckReceipt got an error: Recieved %q", err.Error())
+	}
+
+	wrongReceipt := Receipt{
+		Retailer:     "Target",
+		PurchaseDate: "2023-23-16",
+		PurchaseTime: "13:30",
+		Total:        "0.00",
+		Items:        nil,
+	}
+
+	wrongOutput, err := CheckReceipt(wrongReceipt)
+	if wrongOutput {
+		t.Errorf("CheckReceipt was true, expected false for wrong receipt")
+	}
+
+	if err == nil {
+		t.Errorf("CheckReceipt had no error for wrong receipt")
+	}
 
 }
 
