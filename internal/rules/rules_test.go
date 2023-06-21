@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/jelaniharris/FetchReceiptProcessor/internal/models"
@@ -43,6 +44,7 @@ type OddPurchaseDateStruct struct {
 type CheckPurchaseTimeStruct struct {
 	arg1     string
 	expected bool
+	errorMsg error
 }
 
 func TestAlphanumericLength(t *testing.T) {
@@ -165,20 +167,27 @@ func TestOddPurchaseDate(t *testing.T) {
 
 func TestCheckPurchaseTime(t *testing.T) {
 	testTable := []CheckPurchaseTimeStruct{
-		{"11:15", false},
-		{"14:00", true},
-		{"15:59", true},
-		{"14:59", true},
-		{"15:00", true},
-		{"16:00", false},
-		{"23:59", false},
-		{"01:59", false},
-		{"00:00", false},
+		{"11:15", false, nil},
+		{"14:00", false, nil},
+		{"14:01", true, nil},
+		{"15:59", true, nil},
+		{"14:59", true, nil},
+		{"15:00", true, nil},
+		{"16:00", false, nil},
+		{"23:59", false, nil},
+		{"01:59", false, nil},
+		{"00:00", false, nil},
+		{"26:00", false, errors.New("Invalid Hour format")},
+		{"23:64", false, errors.New("Invalid Minute format")},
 	}
 
 	for _, test := range testTable {
-		if output := checkPurchaseTime(test.arg1); output != test.expected {
+		output, err := checkPurchaseTime(test.arg1)
+		if output != test.expected {
 			t.Errorf("checkPurchaseTime(%q) = got %t, wanted %t", test.arg1, output, test.expected)
+		}
+		if err != nil && err.Error() != test.errorMsg.Error() {
+			t.Errorf("checkPurchaseTime(%q) = expected error was %q, wanted %q", test.arg1, err.Error(), test.errorMsg)
 		}
 	}
 }

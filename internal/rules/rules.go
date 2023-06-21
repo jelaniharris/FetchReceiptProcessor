@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -131,27 +132,42 @@ func oddPurchaseDate(str string) bool {
 
 // Check to see if the purchase time is between 2pm and 4pm
 // Input is assumed to be in 24 hour format e.g. 15:40
-func checkPurchaseTime(str string) bool {
+func checkPurchaseTime(str string) (bool, error) {
 	var hour int
 	var minute int
 
 	// Parsing the string into a hh:mm format
 	n, err := fmt.Sscanf(str, "%d:%d", &hour, &minute)
 
+	// If the scanning produced an error
 	if err != nil {
-		return false
+		return false, errors.New("Could not scan time")
 	}
 
-	if n > 0 && hour >= 14 && hour < 16 {
-		return true
+	// If the parsed time is somehow not a 24 hour clock
+	if hour > 24 || hour < 0 {
+		return false, errors.New("Invalid Hour format")
 	}
 
-	return false
+	// If the parsed minutes is not in minutes
+	if minute > 59 || minute < 0 {
+		return false, errors.New("Invalid Minute format")
+	}
+
+	// If we parsed data and:
+	// The hour is greater than 2pm
+	// The hour is 2pm, and the minute is at least 1 or more
+	// The hour is less than 6pm
+	if n > 0 && (hour > 14 || hour == 14 && minute >= 1) && hour < 16 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 // Given a receipt, calculate the amount of points it's worth based on
 // a series of rules
-func CalculatePoints(rec models.Receipt) int {
+func CalculatePoints(rec models.Receipt) (int, error) {
 	var rulePoints PointRules
 	currentPoints := 0
 
@@ -194,7 +210,12 @@ func CalculatePoints(rec models.Receipt) int {
 	}
 
 	// 10 points if the time of purchase is after 2:00pm and before 4:00pm.
-	if checkPurchaseTime(rec.PurchaseTime) {
+	checkedTime, err := checkPurchaseTime(rec.PurchaseTime)
+	if err != nil {
+		return 0, err
+	}
+
+	if checkedTime {
 		rulePoints.PurchaseTimePoints = 10
 		currentPoints += rulePoints.PurchaseTimePoints
 	}
@@ -202,7 +223,7 @@ func CalculatePoints(rec models.Receipt) int {
 	// Breakdown output in console
 	showBreakdown(rulePoints, currentPoints, rec)
 
-	return currentPoints
+	return currentPoints, nil
 }
 
 // Log the results of the point calculation

@@ -75,7 +75,13 @@ func GetReceiptPoints(c *gin.Context) {
 		return
 	}
 
-	points := rules.CalculatePoints(*receipt)
+	points, err := rules.CalculatePoints(*receipt)
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			ErrorMessage{Message: err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK,
 		ReceiptPointsResponse{Points: points})
