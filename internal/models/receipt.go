@@ -27,7 +27,7 @@ type Receipt struct {
 	// The total amount paid on the receipt.
 	Total string `json:"total" binding:"required"`
 	// The list of items in this receipt
-	Items []Item `json:"items" binding:"required"`
+	Items []Item `json:"items" binding:"required,dive"`
 }
 
 // In-memory storage for the receipts
